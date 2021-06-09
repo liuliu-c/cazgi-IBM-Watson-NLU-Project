@@ -7,6 +7,25 @@ app.use(express.static('client'))
 const cors_app = require('cors');
 app.use(cors_app());
 
+function getNLUInstance (){
+    let api_key = process.env.API_KEY;
+    let api_url = process.env.API_URL;
+
+    const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
+    const { IamAuthenticator } = require('ibm-watson/auth');
+
+    const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
+        version: '2020-08-01',
+        authenticator: new IamAuthenticator({
+            apikey: api_key,
+        }),
+        serviceUrl: api_url,
+    });
+    return naturalLanguageUnderstanding;
+}
+
+
+
 app.get("/",(req,res)=>{
     res.render('index.html');
   });
@@ -64,9 +83,9 @@ app.get("/url/sentiment", (req,res) => {
     getNLUInstance().analyze(analyzeParams)
   .then(analysisResults => {
 
-    console.log(analysisResults.result.entities);
+    //console.log(analysisResults.result.entities);
 
-    const NLUresultSentiment = analysisResults.result.entities[0].sentiment;
+    const NLUresultSentiment = analysisResults.result.entities[0].sentiment.label;
     //let myObj = JSON.parse(result);
     return res.send(NLUresultSentiment);
   })
@@ -97,7 +116,7 @@ app.get("/text/emotion", (req,res) => {
   .catch(err => {
     console.log('error:', err);
   });
-    
+    //return res.send({"happy":"90","sad":"10"});
 }
 );
 
@@ -123,9 +142,9 @@ app.get("/text/sentiment", (req,res) => {
 
     getNLUInstance().analyze(analyzeParams).then(analysisResults => {
 
-    console.log(analysisResults.result.keywords[0].sentiment.label);
+    //console.log(analysisResults.result.keywords[0].sentiment.label);
 
-    const SentimentText = analysisResults.result.keywords[0].sentiment;
+    const SentimentText = analysisResults.result.keywords[0].sentiment.label;
     //let myObj = JSON.parse(result);
     return res.send(SentimentText);
   })
@@ -139,21 +158,3 @@ app.get("/text/sentiment", (req,res) => {
 let server = app.listen(8080, () => {
     console.log('Listening', server.address().port)
 })
-
-function getNLUInstance (){
-    let api_key = process.env.API_KEY;
-    let api_url = process.env.API_URL;
-
-    const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
-    const { IamAuthenticator } = require('ibm-watson/auth');
-
-    const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
-        version: '2020-08-01',
-        authenticator: new IamAuthenticator({
-            apikey: api_key,
-        }),
-        serviceUrl: api_url,
-    });
-    return naturalLanguageUnderstanding;
-}
-
