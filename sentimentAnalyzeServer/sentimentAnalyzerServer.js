@@ -50,9 +50,9 @@ app.get("/url/emotion", (req,res) => {
     getNLUInstance().analyze(analyzeParams)
   .then(analysisResults => {
 
-    console.log(analysisResults.result.entities);
+    //console.log(analysisResults.result.entities);
 
-    const NLUresult = analysisResults.result.entities[0].emotion;
+    const NLUresult = analysisResults.result.keywords[0].emotion;
     //let myObj = JSON.parse(result);
     return res.send(NLUresult);
   })
@@ -67,15 +67,15 @@ app.get("/url/sentiment", (req,res) => {
         const analyzeParams = {
         'url': req.query.url,
         'features': {
-            'entities':{
-                'emotion': false,
-                'sentiment': true
-                //'limit':1
-            },
             'keywords':{
                 'emotion': false,
-                'sentiment': true
-               // 'limit': 1,
+                'sentiment': true,
+                'limit': 1
+            },
+            'entities': {
+                'emotion': false,
+                'sentiment': true,
+                'limit': 1
             }
         }
     }
@@ -83,9 +83,9 @@ app.get("/url/sentiment", (req,res) => {
     getNLUInstance().analyze(analyzeParams)
   .then(analysisResults => {
 
-    //console.log(analysisResults.result.entities);
+    console.log(analysisResults.result);
 
-    const NLUresultSentiment = analysisResults.result.entities[0].sentiment.label;
+    const NLUresultSentiment = analysisResults.result.keywords[0].sentiment.label;
     //let myObj = JSON.parse(result);
     return res.send(NLUresultSentiment);
   })
